@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
-
+require("dotenv").config();
 const router = express.Router();
 
 // 회원가입
@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
     console.log(nickname);
     const token = jwt.sign(
       { userId: user_id, password: user_pw },
-      "my-secret-key"
+      process.env.JWT_SECRET
     );
     res.send({
       mytoken: token,

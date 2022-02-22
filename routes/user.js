@@ -1,5 +1,4 @@
 const express = require("express");
-const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
 

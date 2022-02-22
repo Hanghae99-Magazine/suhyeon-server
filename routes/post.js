@@ -39,7 +39,15 @@ router.post(
 router.put("/:postId/like", authMiddleware, async (req, res) => {});
 
 // 게시글 조회 (인증X)
-router.get("/:postId", async (req, res) => {});
+router.get("/:postId", async (req, res) => {
+  const { postId } = Number(req.params);
+  if (!postId) {
+    res.status(400).send({ msg: `${postId}번 게시물이 존재하지 않습니다.` });
+    return;
+  }
+  const post = await board.findOne({ where: { postId } });
+  res.json({ post });
+});
 
 // 게시글 삭제 (인증O)
 router.delete("/:postId", authMiddleware, async (req, res) => {});

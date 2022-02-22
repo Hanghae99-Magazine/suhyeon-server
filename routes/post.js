@@ -3,7 +3,7 @@ const { Op } = require("sequelize");
 const cors = require("cors");
 const { user, board, likes, comment } = require("../models");
 const authMiddleware = require("../middlewares/auth-middleware");
-const upload = require("../utils/s3");
+const { upload } = require("../utils/s3");
 
 const router = express.Router();
 

@@ -38,6 +38,35 @@ router.post("/register", async (req, res) => {
 });
 
 // 로그인
-router.post("/login", async (req, res) => {});
+router.post("/login", async (req, res) => {
+  try {
+    const { user_id, user_pw } = req.body;
+
+    const users = await user.findOne({
+      where: { userId: user_id, password: user_pw },
+    });
+
+    if (!users) {
+      res.status(400).send({
+        msg: "아이디 또는 비밀번호가 틀렸습니다.",
+      });
+      return;
+    }
+    const userObject = await user.findOne({ where: { userId: user_id } });
+    const nickname = userObject["dataValues"]["nickname"];
+    console.log(nickname);
+    const token = jwt.sign(
+      { userId: user_id, password: user_pw },
+      "my-secret-key"
+    );
+    res.send({
+      mytoken: token,
+      nickname: nickname,
+      msg: "로그인에 성공했습니다.",
+    });
+  } catch (err) {
+    res.status(400).send({ msg: "로그인에 실패했습니다." });
+  }
+});
 
 module.exports = router;

@@ -22,3 +22,5 @@ router.delete("/:postId", async (req, res) => {});
 
 // 게시글 수정 (인증O)
 router.put("/:postId", async (req, res) => {});
+
+module.exports = router;

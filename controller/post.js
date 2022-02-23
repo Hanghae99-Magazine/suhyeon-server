@@ -11,7 +11,7 @@ async function selectAll(req, res) {
 async function insertPost(req, res) {
   const { post_content, img_position } = req.body;
   const userId = res.locals.user.userId;
-  const { location } = req.file;
+  const { img } = req.file;
 
   if (!post_content && !location) {
     res.status(400).send({ msg: "사진 또는 내용을 입력해주세요!" });

@@ -26,7 +26,7 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: true,
       },
       imgPosition: {
-        type: DataTypes.STRING(300),
+        type: DataTypes.STRING(100),
         allowNull: false,
       },
       uploadDate: {

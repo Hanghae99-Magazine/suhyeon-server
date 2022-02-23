@@ -1,71 +1,33 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
-const { user } = require("../models");
-require("dotenv").config();
+const { body } = require("express-validator");
+const { validate } = require("../middlewares/validator");
+const userController = require("../controller/user");
+
 const router = express.Router();
 
-// 회원가입
-router.post("/register", async (req, res) => {
-  try {
-    const { user_id, nickname, user_pw, pw_check } = req.body;
-
-    if (user_pw !== pw_check) {
-      res
-        .status(400)
-        .send({ msg: "패스워드가 패스워드 확인란과 동일하지 않습니다." });
-      return;
+const validateRegister = [
+  body("nickname")
+    .trim()
+    .notEmpty()
+    .isLength({ min: 3 })
+    .withMessage("숫자와 알파벳을 3글자 이상 입력해주세요."),
+  body("user_pw")
+    .trim()
+    .notEmpty()
+    .isLength({ min: 4 })
+    .withMessage("비밀번호는 4글자 이상 입력해주세요."),
+  body("user_pw").custom((value, { req }) => {
+    if (value.includes(req.body.nickname)) {
+      throw new Error("패스워드에 닉네임이 포함되면 안됩니다.");
     }
-    const existUser = await user.findAll({
-      where: { userId: user_id },
-    });
-    if (existUser.length) {
-      res.status(400).send({ msg: "이미 가입된 아이디가 있습니다." });
-      return;
+  }),
+  body("pw_check").custom((value, { req }) => {
+    if (value !== req.body.user_pw) {
+      throw new Error("패스워드가 일치하지 않습니다.");
     }
-    await user.create({
-      userId: user_id,
-      password: user_pw,
-      nickname: nickname,
-    });
-    res.status(201).send({ msg: "회원가입 되었습니다!" });
-  } catch (err) {
-    console.log(err);
-    res.status(400).send({
-      msg: "요청한 데이터 형식이 올바르지 않습니다.",
-    });
-  }
-});
+  }),
+  validate,
+];
 
-// 로그인
-router.post("/login", async (req, res) => {
-  try {
-    const { user_id, user_pw } = req.body;
-
-    const users = await user.findOne({
-      where: { userId: user_id, password: user_pw },
-    });
-
-    if (!users) {
-      res.status(400).send({
-        msg: "아이디 또는 비밀번호가 틀렸습니다.",
-      });
-      return;
-    }
-    const userObject = await user.findOne({ where: { userId: user_id } });
-    const nickname = userObject["dataValues"]["nickname"];
-    console.log(nickname);
-    const token = jwt.sign(
-      { userId: user_id, password: user_pw },
-      process.env.JWT_SECRET
-    );
-    res.send({
-      mytoken: token,
-      nickname: nickname,
-      msg: "로그인에 성공했습니다.",
-    });
-  } catch (err) {
-    res.status(400).send({ msg: "로그인에 실패했습니다." });
-  }
-});
-
-module.exports = router;
+router.post("/register", validateRegister, userController.register);
+router.post("/login", userController.login);

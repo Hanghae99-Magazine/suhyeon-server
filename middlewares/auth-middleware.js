@@ -1,28 +1,26 @@
 const jwt = require("jsonwebtoken");
-const { user } = require("../models");
+const { findByUserId } = require("../data/user");
 require("dotenv").config();
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-  const [tokenType, tokenValue] = authorization.split(" ");
-  console.log(authorization);
+  const authHeader = req.get("Authorization");
 
-  if (tokenType !== "Bearer") {
-    res.status(401).send({
-      errorMessage: "로그인 후 사용하세요",
-    });
-    return;
+  if (!(authHeader && authHeader.startsWith("Bearer "))) {
+    return res.status(401).json({ msg: "로그인 후 사용하세요." });
   }
-  try {
-    const { userId } = jwt.verify(tokenValue, process.env.JWT_SECRET);
-    user.findByPk(userId).then((user) => {
-      res.locals.user = user;
-      next();
-    });
-  } catch (error) {
-    res.status(401).send({
-      errorMessage: "로그인 후 사용하세요",
-    });
-    return;
-  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.JWT_SECRET, async (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ msg: "로그인 후 사용하세요." });
+    }
+    const users = await findByUserId(decoded.id);
+
+    if (!users) {
+      return res.status(401).json({ msg: "로그인 후 사용하세요." });
+    }
+    req.userId = users.dataValues.userId; // req.customData
+    next();
+  });
 };

@@ -10,8 +10,8 @@ async function selectAll(req, res) {
 // 게시글 추가 (인증O)
 async function insertPost(req, res) {
   const { post_content, img_position } = req.body;
-  const userId = res.locals.user.userId;
-  const { img } = req.file;
+  const userId = req.userId;
+  const img = req.file;
 
   if (!post_content && !location) {
     res.status(400).send({ msg: "사진 또는 내용을 입력해주세요!" });
@@ -20,29 +20,37 @@ async function insertPost(req, res) {
     userId,
     content: post_content,
     imgPosition: img_position,
-    img: location,
+    img: img,
   });
   res.status(201).send({ msg: "게시물이 등록되었습니다!" });
 }
 
-// 게시글 좋아요 및 좋아요 취소 (인증O)
-async function like(req, res) {
-  const { postId } = Number(req.params);
-  const userId = res.locals.user.userId;
+// 게시글 좋아요 등록(인증O)
+async function createLike(req, res) {
+  const postId = Number(req.params.postId);
+  const userId = req.userId;
+
+  await likes.create({ userId, postId, isCheck: true });
+  res.status(200).json({ like_check: true, msg: "좋아요 등록" });
+}
+
+// 게시글 좋아요 해제(인증O)
+async function updateLike(req, res) {
+  const postId = Number(req.params.postId);
+  const userId = req.userId;
 
   const checkExist = await postRepository.getLikeInfo(userId, postId);
+
   if (checkExist) {
-    await likes.update({ isCheck: false });
-    res.status(200).json({ like_check: false, msg: "좋아요 취소" });
-    return;
+    await likes.update({ isCheck: false }, { where: { postId } });
   }
-  await likes.update({ isCheck: true });
-  res.status(200).json({ like_check: true, msg: "좋아요 등록" });
+  res.status(200).json({ like_check: true, msg: "좋아요 해제" });
 }
 
 // 게시글 조회 (인증X)
 async function selectPostDetail(req, res) {
-  const { postId } = Number(req.params);
+  const postId = Number(req.params.postId);
+
   if (!postId) {
     res.status(400).send({ msg: `${postId}번 게시물이 존재하지 않습니다.` });
     return;
@@ -53,8 +61,8 @@ async function selectPostDetail(req, res) {
 
 // 게시글 삭제 (인증O)
 async function deletePost(req, res) {
-  const { postId } = Number(req.params);
-  const userId = authMiddleware.userId;
+  const postId = Number(req.params.postId);
+  const userId = req.userId;
   const existPost = await postRepository.getById(postId);
   if (!existPost) {
     return res
@@ -64,14 +72,14 @@ async function deletePost(req, res) {
   if (existPost.userId !== req.userId) {
     return res.sendStatus(403);
   }
-  await postRepository.remove(userId, postId);
+  await postRepository.remove(postId);
   res.sendStatus(204);
 }
 
 // 게시글 수정 (인증O)
 async function updatePost(req, res) {
   const { post_id, post_content, img_position } = req.body;
-  const { location } = req.file;
+  const img = req.file;
 
   const existPost = await postRepository.getById(post_id);
   if (!existPost) {
@@ -89,7 +97,8 @@ async function updatePost(req, res) {
 module.exports = {
   selectAll,
   insertPost,
-  like,
+  createLike,
+  updateLike,
   selectPostDetail,
   deletePost,
   updatePost,

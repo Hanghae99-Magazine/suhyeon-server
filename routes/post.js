@@ -2,7 +2,8 @@ const express = require("express");
 const {
   selectAll,
   insertPost,
-  like,
+  createLike,
+  updateLike,
   selectPostDetail,
   deletePost,
   updatePost,
@@ -14,7 +15,8 @@ const router = express.Router();
 
 router.get("/", selectAll);
 router.post("/", authMiddleware, upload.single("imageFile"), insertPost);
-router.put("/:postId/like", authMiddleware, like);
+router.post("/:postId/like", authMiddleware, createLike);
+router.put("/:postId/like", authMiddleware, updateLike);
 router.get("/:postId", selectPostDetail);
 router.delete("/:postId", authMiddleware, deletePost);
 router.put("/:postId", authMiddleware, upload.single("imageFile"), updatePost);

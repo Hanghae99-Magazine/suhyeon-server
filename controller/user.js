@@ -68,4 +68,13 @@ function createJwtToken(id) {
   });
 }
 
-module.exports = { register, login };
+async function me(req, res, next) {
+  const userId = req.userId;
+  const users = await userRepository.findByUserId(userId);
+  if (!users) {
+    return res.status(404).json({ msg: "User not found" });
+  }
+  res.status(200).json({ token: req.token, userId: users.userId });
+}
+
+module.exports = { register, login, me };

@@ -5,11 +5,18 @@ async function getAll() {
 }
 
 async function create(post) {
-  return board.create(post).then((data) => this.getById(data.dataValues.id));
+  return board
+    .create({
+      userId: post.userId,
+      content: post.content,
+      img: post.img,
+      imgPosition: post.imgPosition,
+    })
+    .then((data) => this.getById(data.dataValues.postId));
 }
 
 async function getLikeInfo(userId, postId) {
-  return likes.findAll({ where: { userId, postId } });
+  return likes.findOne({ where: { userId, postId } });
 }
 
 async function getById(postId) {
@@ -17,7 +24,7 @@ async function getById(postId) {
 }
 
 async function remove(postId) {
-  return board.findByPk(postId).then((post) => post.remove());
+  return board.findByPk(postId).then((post) => post.destroy());
 }
 
 async function update(postId, location, imgPosition, content) {

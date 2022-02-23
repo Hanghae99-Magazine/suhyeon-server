@@ -45,7 +45,7 @@ async function login(req, res) {
     });
     return;
   }
-  const isValidPassword = await bcrypt.compare(user_pw, user.password);
+  const isValidPassword = await bcrypt.compare(user_pw, users.password);
   if (!isValidPassword) {
     res.status(400).send({
       msg: "아이디 또는 비밀번호가 틀렸습니다.",
@@ -64,7 +64,7 @@ async function login(req, res) {
 
 function createJwtToken(id) {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.expiresInSec,
+    expiresIn: Number(process.env.expiresInSec),
   });
 }
 

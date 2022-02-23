@@ -20,4 +20,5 @@ async function remove(postId) {
   return board.findByPk(postId).then((post) => post.remove());
 }
 
-module.exports = { getAll, create, getLikeInfo, getById, remove };
+async function update(postId, location, imgPosition, content) {}
+module.exports = { getAll, create, getLikeInfo, getById, remove, update };

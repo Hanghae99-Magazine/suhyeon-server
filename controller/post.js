@@ -9,15 +9,17 @@ async function selectAll(req, res) {
 
 // 게시글 추가 (인증O)
 async function insertPost(req, res) {
-  const { user_id, post_content } = req.body;
+  const { post_content, img_position } = req.body;
+  const userId = res.locals.user.userId;
   const { location } = req.file;
 
   if (!post_content && !location) {
     res.status(400).send({ msg: "사진 또는 내용을 입력해주세요!" });
   }
   await postRepository.create({
-    userId: user_id,
+    userId,
     content: post_content,
+    imgPosition: img_position,
     img: location,
   });
   res.status(201).send({ msg: "게시물이 등록되었습니다!" });
@@ -68,7 +70,7 @@ async function deletePost(req, res) {
 
 // 게시글 수정 (인증O)
 async function updatePost(req, res) {
-  const { post_id, post_content } = req.body;
+  const { post_id, post_content, img_position } = req.body;
   const { location } = req.file;
 
   const existPost = await postRepository.getById(post_id);
@@ -80,7 +82,7 @@ async function updatePost(req, res) {
   if (existPost.userId !== req.userId) {
     return res.sendStatus(403);
   }
-  await postRepository.update(post_id, location, post_content);
+  await postRepository.update(post_id, location, img_position, post_content);
   res.status(200).json({ msg: "수정되었습니다." });
 }
 

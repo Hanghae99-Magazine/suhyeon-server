@@ -5,7 +5,7 @@ const userRepository = require("../data/user");
 require("dotenv").config();
 
 // 회원가입
-export async function register(req, res) {
+async function register(req, res) {
   const { user_id, nickname, user_pw, pw_check } = req.body;
 
   if (user_pw !== pw_check) {
@@ -22,7 +22,7 @@ export async function register(req, res) {
     return;
   }
 
-  const hashed = await bcrypt.hash(user_pw, process.env.saltRounds);
+  const hashed = await bcrypt.hash(user_pw, Number(process.env.saltRounds));
   const userId = await userRepository.createUser({
     userId: user_id,
     password: hashed,
@@ -34,12 +34,10 @@ export async function register(req, res) {
 }
 
 // 로그인
-export async function login(req, res) {
+async function login(req, res) {
   const { user_id, user_pw } = req.body;
 
-  const users = await user.findOne({
-    where: { userId: user_id, password: user_pw },
-  });
+  const users = await userRepository.findByUserId(user_id);
 
   if (!users) {
     res.status(400).send({
@@ -47,9 +45,15 @@ export async function login(req, res) {
     });
     return;
   }
-  const userObject = await user.findOne({ where: { userId: user_id } });
-  const nickname = userObject["dataValues"]["nickname"];
-  console.log(nickname);
+  const isValidPassword = await bcrypt.compare(user_pw, user.password);
+  if (!isValidPassword) {
+    res.status(400).send({
+      msg: "아이디 또는 비밀번호가 틀렸습니다.",
+    });
+    return;
+  }
+
+  const nickname = users["dataValues"]["nickname"];
   const token = createJwtToken(user_id);
   res.send({
     mytoken: token,
@@ -63,3 +67,5 @@ function createJwtToken(id) {
     expiresIn: process.env.expiresInSec,
   });
 }
+
+module.exports = { register, login };

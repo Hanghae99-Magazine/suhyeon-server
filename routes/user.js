@@ -1,7 +1,7 @@
 const express = require("express");
 const { body } = require("express-validator");
 const { validate } = require("../middlewares/validator");
-const userController = require("../controller/user");
+const { register, login } = require("../controller/user");
 
 const router = express.Router();
 
@@ -26,8 +26,9 @@ const validateRegister = [
       throw new Error("패스워드가 일치하지 않습니다.");
     }
   }),
-  validate,
 ];
 
-router.post("/register", validateRegister, userController.register);
-router.post("/login", userController.login);
+router.post("/register", validateRegister, register);
+router.post("/login", login);
+
+module.exports = router;

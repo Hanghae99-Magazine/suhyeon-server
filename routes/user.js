@@ -3,6 +3,7 @@ const { body } = require("express-validator");
 const validate = require("../middlewares/validator");
 const { register, login, me } = require("../controller/user");
 const authMiddleware = require("../middlewares/auth-middleware");
+const loginCheckMiddleware = require("../middlewares/login-check-middleware");
 const router = express.Router();
 
 const validateRegister = [
@@ -30,8 +31,8 @@ const validateRegister = [
   validate,
 ];
 
-router.post("/register", validateRegister, register);
-router.post("/login", login);
+router.post("/register", loginCheckMiddleware, validateRegister, register);
+router.post("/login", loginCheckMiddleware, login);
 router.get("/user/me", authMiddleware, me);
 
 module.exports = router;

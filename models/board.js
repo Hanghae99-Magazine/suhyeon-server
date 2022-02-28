@@ -1,7 +1,8 @@
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
+
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    "board",
+    'board',
     {
       postId: {
         autoIncrement: true,
@@ -13,8 +14,8 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING(50),
         allowNull: true,
         references: {
-          model: "user",
-          key: "userId",
+          model: 'user',
+          key: 'userId',
         },
       },
       content: {
@@ -32,24 +33,24 @@ module.exports = function (sequelize, DataTypes) {
       uploadDate: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: Sequelize.Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     },
     {
       sequelize,
-      tableName: "board",
+      tableName: 'board',
       timestamps: false,
       indexes: [
         {
-          name: "PRIMARY",
+          name: 'PRIMARY',
           unique: true,
-          using: "BTREE",
-          fields: [{ name: "postId" }],
+          using: 'BTREE',
+          fields: [{ name: 'postId' }],
         },
         {
-          name: "userId",
-          using: "BTREE",
-          fields: [{ name: "userId" }],
+          name: 'userId',
+          using: 'BTREE',
+          fields: [{ name: 'userId' }],
         },
       ],
     }

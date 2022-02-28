@@ -73,10 +73,10 @@ async function deletePost(req, res) {
       .status(400)
       .json({ msg: `${postId}번 게시물이 존재하지 않습니다.` });
   }
-  if (existPost.userId !== req.userId) {
+  if (existPost.userId !== userId) {
     return res.sendStatus(403);
   }
-  await postRepository.remove(userId, postId);
+  await postRepository.remove(postId);
   res.sendStatus(204);
 }
 

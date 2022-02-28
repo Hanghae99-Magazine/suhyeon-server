@@ -2,12 +2,14 @@ const jwt = require("jsonwebtoken");
 const { user } = require("../models");
 const bcrypt = require("bcrypt");
 const userRepository = require("../data/user");
+const { Op } = require("sequelize");
 require("dotenv").config();
 
 // 회원가입
 async function register(req, res) {
+  console.log("req", req);
   const { user_id, nickname, user_pw, pw_check } = req.body;
-
+  console.log("debug!!!!!!!!!!!!!!", user_id, nickname, user_pw, pw_check);
   if (user_pw !== pw_check) {
     res
       .status(400)
@@ -15,8 +17,9 @@ async function register(req, res) {
     return;
   }
   const existUser = await user.findAll({
-    where: { userId: user_id },
+    where: { [Op.or]: [{ userId: user_id }, { nickname }] },
   });
+  console.log("debug!!!!!!!!!!!!!!", existUser);
   if (existUser.length) {
     res.status(400).send({ msg: "이미 가입된 아이디가 있습니다." });
     return;

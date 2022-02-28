@@ -6,6 +6,7 @@ async function findByUserId(userId) {
 }
 
 async function createUser(users) {
+  console.log("adssdasdasdasd", users);
   return user.create(users).then((data) => data.dataValues.id);
 }
 

@@ -11,7 +11,7 @@ async function selectAll(req, res) {
 async function insertPost(req, res) {
   const { post_content, img_position } = req.body;
   const userId = req.userId;
-  const img = req.file;
+  const { location } = req.file;
 
   if (!post_content && !location) {
     res.status(400).send({ msg: "사진 또는 내용을 입력해주세요!" });
@@ -20,7 +20,7 @@ async function insertPost(req, res) {
     userId,
     content: post_content,
     imgPosition: img_position,
-    img: img,
+    img: location,
   });
   res.status(201).send({ msg: "게시물이 등록되었습니다!" });
 }

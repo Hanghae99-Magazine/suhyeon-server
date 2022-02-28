@@ -17,7 +17,7 @@ const upload = multer({
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: "public-read",
     key: (req, file, cb) => {
-      cb(null, `${Date.now()}_${file.originalname}`);
+      cb(null, `${Date.now()}${path.basename(file.originalname)}`);
     },
   }),
   limits: { fileSize: 5 * 1024 * 1024 },

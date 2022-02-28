@@ -1,7 +1,7 @@
 const express = require("express");
 const { check, body } = require("express-validator");
 const validate = require("../middlewares/validator");
-const { register, login, me } = require("../controller/user");
+const { register, login, logout, me } = require("../controller/user");
 const authMiddleware = require("../middlewares/auth-middleware");
 const loginCheckMiddleware = require("../middlewares/login-check-middleware");
 
@@ -38,6 +38,7 @@ const validateRegister = [
 
 router.post("/register", [loginCheckMiddleware, validateRegister], register);
 router.post("/login", loginCheckMiddleware, login);
+router.delete("/logout", authMiddleware, logout);
 router.get("/user/me", authMiddleware, me);
 
 module.exports = router;

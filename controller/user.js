@@ -65,6 +65,11 @@ async function login(req, res) {
   });
 }
 
+async function logout(req, res) {
+  res.clearCookie("mytoken");
+  res.send({ msg: "로그아웃 되었습니다." });
+}
+
 function createJwtToken(id) {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: Number(process.env.expiresInSec),
@@ -80,4 +85,4 @@ async function me(req, res, next) {
   res.status(200).json({ token: req.token, userId: users.userId });
 }
 
-module.exports = { register, login, me };
+module.exports = { register, login, logout, me };

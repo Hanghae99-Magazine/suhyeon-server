@@ -1,4 +1,5 @@
-const { user, board, likes, comment } = require("../models");
+// eslint-disable-next-line no-unused-vars
+const { board, likes, comment } = require('../models');
 
 async function getAll() {
   return board.findAll();
@@ -23,12 +24,12 @@ async function getById(postId) {
   return board.findOne({ where: { postId } });
 }
 
-async function remove(postId) {
+async function remove(userId, postId) {
   return board.findByPk(postId).then((post) => post.destroy());
 }
 
 async function update(postId, location, imgPosition, content) {
-  const post = board.findOne(
+  return board.update(
     { img: location, imgPosition, content },
     { where: { postId } }
   );
